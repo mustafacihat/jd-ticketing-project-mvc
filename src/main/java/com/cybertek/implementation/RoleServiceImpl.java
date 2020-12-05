@@ -1,10 +1,7 @@
 package com.cybertek.implementation;
 
 import com.cybertek.dto.RoleDTO;
-import com.cybertek.dto.UserDTO;
-import com.cybertek.entity.Role;
 import com.cybertek.service.RoleService;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +18,11 @@ public class RoleServiceImpl extends AbstractMapService<RoleDTO, Long> implement
     @Override
     public void deleteById(Long id) {
         super.deleteById(id);
+    }
+
+    @Override
+    public void update(RoleDTO object) {
+        super.update(object.getId(),object);
     }
 
     @Override

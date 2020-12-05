@@ -9,15 +9,11 @@ import com.cybertek.service.RoleService;
 import com.cybertek.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -32,42 +28,69 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping({"/create","/add","/initialize"})
-    public String createUser(Model model){
+    @GetMapping("/create")//"/add","/initialize"})
+    public String createUser(Model model) {
 
         model.addAttribute("user", new UserDTO());
-        List<RoleDTO> rolesList = roleService.findAll();
+        model.addAttribute("users", userService.findAll());
+        model.addAttribute("roles", roleService.findAll());
 
         //List<String> rolesList = roles.stream().map(RoleDTO::getDescription).collect(Collectors.toList());
 
-        model.addAttribute("rolesList",rolesList);
 
         return "/user/create";
     }
 
-    @PostMapping("/save")
-    public String saveUser(@ModelAttribute("user") UserDTO user,Model model){
+    @PostMapping("/create")
+    public String insertUser(UserDTO user, Model model) {
 
-        user.setRole(roleService.findById(user.getRoleId()));
-        model.addAttribute("userList", Arrays.asList(user));
+        userService.save(user);
+       /* model.addAttribute("user", new UserDTO());
+        model.addAttribute("users",userService.findAll());
+        model.addAttribute("roles",roleService.findAll());
+*/
+        //user.setRole(roleService.findById(user.getRoleId()));
 
 
-        model.addAttribute("user", new UserDTO());
-        List<RoleDTO> rolesList = roleService.findAll();
+        //model.addAttribute("user", new UserDTO());
+        //List<RoleDTO> rolesList = roleService.findAll();
 
         //List<String> rolesList = roles.stream().map(RoleDTO::getDescription).collect(Collectors.toList());
 
-        model.addAttribute("rolesList",rolesList);
+        return "redirect:/user/create";
+
+    }
+
+    @GetMapping("/update/{username}")
+    public String editUser(@PathVariable("username") String username, Model model) {
 
 
+        model.addAttribute("user", userService.findById(username));
+        model.addAttribute("users", userService.findAll());
+        model.addAttribute("roles", roleService.findAll());
+        return "/user/update";
+
+    }
+
+    @PostMapping("/update/{username}")
+    public String updateUser(@PathVariable("username") String username, UserDTO user, Model model) {
 
 
+        userService.deleteById(userService.findById(username).getUserName());
+        userService.update(user);
+    /*    model.addAttribute("user", new UserDTO());
+        model.addAttribute("roles",roleService.findAll());
+        model.addAttribute("users",userService.findAll());*/
 
+        return "redirect:/user/create";
+    }
 
-        System.out.println(user);
+    @GetMapping("/delete/{username}")
+    public String deleteUser(@PathVariable("username") String username) {
 
-        return "/user/create";
+        userService.deleteById(username);
 
+        return "redirect:/user/create";
     }
 
 }
